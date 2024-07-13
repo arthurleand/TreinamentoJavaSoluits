@@ -8,17 +8,20 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id_usuario")
+@IdClass(UsuarioProcessoSistemaModel.class)
 @Entity(name = "UsuarioProcessoSistema)")
 @Table(name = "usuario_processo_sistema")
 public class UsuarioProcessoSistemaModel {
 
     @NotBlank
     @Id
-    private Long id_usuario;
+    @ManyToOne
+    private UsuarioModel id_usuario;
 
     @NotBlank
-    private Long id_sistema;
+    @Id
+    @ManyToOne
+    private SistemaModel id_sistema;
 
     @NotBlank
     private String numeroProcesso;

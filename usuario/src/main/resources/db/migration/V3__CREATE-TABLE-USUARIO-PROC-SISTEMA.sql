@@ -4,5 +4,6 @@ create table usuario_processo_sistema(
     id_sistema bigint not null,
     numeroProcesso varchar(25) not null,
 
-    primary key (id_usuario)
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id),
+    FOREIGN KEY (id_sistema) REFERENCES sistema(id)
 );

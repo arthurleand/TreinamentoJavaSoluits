@@ -2,7 +2,6 @@ package br.jus.tjba.api.push.usuario.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Getter
@@ -15,7 +14,6 @@ import lombok.*;
 public class EnderecoUsuarioModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank

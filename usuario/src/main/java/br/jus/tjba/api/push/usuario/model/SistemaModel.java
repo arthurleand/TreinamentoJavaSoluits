@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,4 +21,7 @@ public class SistemaModel {
 
     @NotBlank
     private String sigla;
+
+    @OneToMany(mappedBy = "id_sistema", cascade = CascadeType.REMOVE)
+    private List<UsuarioProcessoSistemaModel> usuarioProcessoSistemaModelList;
 }
