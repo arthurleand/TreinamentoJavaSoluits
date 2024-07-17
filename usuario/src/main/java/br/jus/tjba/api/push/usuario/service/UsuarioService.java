@@ -114,4 +114,39 @@ public class UsuarioService {
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
     }
+
+    public ResponseEntity<UsuarioForm> atualizar(Long id, UsuarioForm usuarioForm) {
+        Optional<UsuarioModel> usuario = usuarioRepository.findById(id);
+
+        if (usuario.isPresent()) {
+            if(usuarioRepository.findByCpf(usuarioForm.cpf()).isEmpty() ||
+                    usuario.get().getCpf().equals(usuarioForm.cpf())){
+                if (usuarioRepository.findByLogin(usuarioForm.login()).isEmpty() ||
+                        usuario.get().getLogin().equals(usuarioForm.login())){
+                    Optional<EnderecoUsuarioModel> endereco = enderecoUsuarioRepository.findById(id);
+
+                    EnderecoUsuarioModel enderecoModel = endereco.get();
+                    enderecoModel.setRua(usuarioForm.enderecoForm().rua());
+                    enderecoModel.setCep(usuarioForm.enderecoForm().cep());
+                    enderecoModel.setNumero(usuarioForm.enderecoForm().numero());
+                    enderecoModel.setBairro(usuarioForm.enderecoForm().bairro());
+                    enderecoModel.setCidade(usuarioForm.enderecoForm().cidade());
+                    enderecoModel.setUf(usuarioForm.enderecoForm().uf());
+
+                    UsuarioModel usuarioModel = usuario.get();
+                    usuarioModel.setLogin(usuarioForm.login());
+                    usuarioModel.setCpf(usuarioForm.cpf());
+                    usuarioModel.setSenha(usuarioForm.senha());
+
+                    usuarioRepository.save(usuarioModel);
+                    enderecoUsuarioRepository.save(enderecoModel);
+
+                    return ResponseEntity.ok(usuarioForm);
+                }
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já está em uso!!");
+            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já está em uso!!");
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+    }
 }

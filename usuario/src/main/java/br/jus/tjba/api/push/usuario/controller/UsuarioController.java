@@ -38,4 +38,10 @@ public class UsuarioController {
     public ResponseEntity<?> cadastro(@Valid @RequestBody UsuarioForm usuarioForm){
         return service.cadastrar(usuarioForm);
     }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<UsuarioForm> atualizar(@PathVariable Long id, @RequestBody UsuarioForm usuarioForm){
+        return service.atualizar(id,usuarioForm);
+    }
 }
