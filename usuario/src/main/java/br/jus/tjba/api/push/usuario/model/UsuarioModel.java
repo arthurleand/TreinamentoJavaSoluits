@@ -1,5 +1,6 @@
 package br.jus.tjba.api.push.usuario.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class UsuarioModel {
     private String cpf;
 
 
-    @OneToMany(mappedBy = "id_usuario", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "id_usuario", cascade = CascadeType.MERGE)
+    @JsonIgnore
     private List<UsuarioProcessoSistemaModel> usuarioProcessoSistemaModelList;
 }

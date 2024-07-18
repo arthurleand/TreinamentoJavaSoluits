@@ -1,5 +1,6 @@
 package br.jus.tjba.api.push.usuario.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -22,6 +23,7 @@ public class SistemaModel {
     @NotBlank
     private String sigla;
 
-    @OneToMany(mappedBy = "id_sistema", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "id_sistema", cascade = CascadeType.MERGE)
+    @JsonIgnore
     private List<UsuarioProcessoSistemaModel> usuarioProcessoSistemaModelList;
 }

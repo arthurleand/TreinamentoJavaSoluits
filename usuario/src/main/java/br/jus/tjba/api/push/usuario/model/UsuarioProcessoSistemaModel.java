@@ -13,16 +13,17 @@ import lombok.*;
 @Table(name = "usuario_processo_sistema")
 public class UsuarioProcessoSistemaModel {
 
-    @NotBlank
     @Id
     @ManyToOne
+    @JoinColumn(name = "id_usuario")
     private UsuarioModel id_usuario;
 
-    @NotBlank
     @Id
     @ManyToOne
+    @JoinColumn(name = "id_sistema")
     private SistemaModel id_sistema;
 
     @NotBlank
-    private String numeroProcesso;
+    @Column(name = "numero_processo")
+    private String numero_processo;
 }

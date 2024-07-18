@@ -1,11 +1,17 @@
 package br.jus.tjba.api.push.usuario.service;
 
 import br.jus.tjba.api.push.usuario.model.EnderecoUsuarioModel;
+import br.jus.tjba.api.push.usuario.model.SistemaModel;
 import br.jus.tjba.api.push.usuario.model.UsuarioModel;
+import br.jus.tjba.api.push.usuario.model.UsuarioProcessoSistemaModel;
 import br.jus.tjba.api.push.usuario.model.dto.EnderecoDTO;
 import br.jus.tjba.api.push.usuario.model.dto.UsuarioDto;
+import br.jus.tjba.api.push.usuario.model.form.BuscarAssociadosForm;
 import br.jus.tjba.api.push.usuario.model.form.UsuarioForm;
+import br.jus.tjba.api.push.usuario.model.form.UsuarioProcSistForm;
 import br.jus.tjba.api.push.usuario.repository.EnderecoUsuarioRepository;
+import br.jus.tjba.api.push.usuario.repository.SistemaRepository;
+import br.jus.tjba.api.push.usuario.repository.UsuarioProcessoSistemaRepository;
 import br.jus.tjba.api.push.usuario.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,20 +27,27 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
     @Autowired
     private EnderecoUsuarioRepository enderecoUsuarioRepository;
+
+    @Autowired
+    private SistemaRepository sistemaRepository;
+
+    @Autowired
+    private UsuarioProcessoSistemaRepository usuarioProcessoSistemaRepository;
 
     public ResponseEntity<UsuarioModel> cadastrar(UsuarioForm usuarioForm) {
         Optional<UsuarioModel> cpfValidation = usuarioRepository.findByCpf(usuarioForm.cpf());
 
         if (cpfValidation.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já está sendo utilizado!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já está sendo utilizado!!");
         }
 
         Optional<UsuarioModel> emailValidation = usuarioRepository.findByLogin(usuarioForm.login());
 
         if (emailValidation.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já está sendo utilizado!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já está sendo utilizado!!");
         }
 
         UsuarioModel novoUsuario= new UsuarioModel();
@@ -112,7 +125,7 @@ public class UsuarioService {
 
             return ResponseEntity.status(200).body(usuarioDto);
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!!");
     }
 
     public ResponseEntity<UsuarioForm> atualizar(Long id, UsuarioForm usuarioForm) {
@@ -147,6 +160,57 @@ public class UsuarioService {
             }
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já está em uso!!");
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!!");
+    }
+
+    public ResponseEntity<UsuarioProcSistForm> associarProc(UsuarioProcSistForm usuarioProcSistForm) {
+        if (usuarioProcessoSistemaRepository.
+                findByUsuarioProcessoSistema(usuarioProcSistForm.id_usuario(),usuarioProcSistForm.id_sistema(),
+                                                usuarioProcSistForm.numero_processo()).isEmpty()){
+            Optional<UsuarioModel> usuario = usuarioRepository.findById(usuarioProcSistForm.id_usuario());
+
+            if(usuario.isPresent()){
+                Optional<SistemaModel> sistema = sistemaRepository.findById(usuarioProcSistForm.id_sistema());
+
+                if (sistema.isPresent()){
+                    UsuarioModel usuarioModel = usuario.get();
+                    SistemaModel sistemaModel = sistema.get();
+
+                    UsuarioProcessoSistemaModel usuarioProcSist = new UsuarioProcessoSistemaModel();
+
+                    usuarioProcSist.setId_usuario(usuarioModel);
+                    usuarioProcSist.setId_sistema(sistemaModel);
+                    usuarioProcSist.setNumero_processo(usuarioProcSistForm.numero_processo());
+
+                    usuarioProcessoSistemaRepository.save(usuarioProcSist);
+                    return ResponseEntity.status(201).body(usuarioProcSistForm);
+                }
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sistema inválido!!");
+            }
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!!");
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Processo já está associado ao usuário neste sistema!!" );
+    }
+
+    public void desassociarProc(UsuarioProcSistForm usuarioProcSistForm) {
+        Optional<UsuarioProcessoSistemaModel> usuarioProcSist  =usuarioProcessoSistemaRepository.
+                findByUsuarioProcessoSistema(usuarioProcSistForm.id_usuario(),usuarioProcSistForm.id_sistema(),
+                        usuarioProcSistForm.numero_processo());
+        if (usuarioProcSist.isPresent()){
+            UsuarioProcessoSistemaModel usuarioProcessoSistemaModel= usuarioProcSist.get();
+            usuarioProcessoSistemaRepository.delete(usuarioProcessoSistemaModel);
+        }else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Processo não encontrado!!" );
+        }
+    }
+
+    public ResponseEntity<List<UsuarioProcessoSistemaModel>> buscarAssocProc(BuscarAssociadosForm associadosForm) {
+        List<UsuarioProcessoSistemaModel> listaUspm = usuarioProcessoSistemaRepository
+                .findByAssociados(associadosForm.id_sistema(), associadosForm.numero_processo());
+        return ResponseEntity.status(200).body(listaUspm);
+    }
+
+    public void deletar(Long id) {
+        usuarioRepository.deleteById(id);
     }
 }
