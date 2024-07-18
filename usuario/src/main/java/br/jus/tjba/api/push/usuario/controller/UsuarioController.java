@@ -69,6 +69,7 @@ public class UsuarioController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
+    @Transactional
     public void deletar(@PathVariable Long id){
         service.deletar(id);
     }

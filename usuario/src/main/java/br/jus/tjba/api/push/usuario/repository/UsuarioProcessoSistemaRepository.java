@@ -2,6 +2,7 @@ package br.jus.tjba.api.push.usuario.repository;
 
 import br.jus.tjba.api.push.usuario.model.UsuarioProcessoSistemaModel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +24,10 @@ public interface UsuarioProcessoSistemaRepository extends JpaRepository<UsuarioP
             "WHERE ups.id_sistema= :id_sistema  " +
             "AND ups.numero_processo= :numero_processo", nativeQuery = true)
     public List<UsuarioProcessoSistemaModel> findByAssociados(Long id_sistema, String numero_processo);
+
+    @Modifying
+    @Query(value = "DELETE " +
+            "FROM usuario_processo_sistema ups " +
+            "WHERE ups.id_usuario = :id_usuario", nativeQuery = true)
+    public void deletarPorUsuario(Long id_usuario);
 }

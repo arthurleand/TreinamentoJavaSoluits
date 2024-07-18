@@ -211,6 +211,8 @@ public class UsuarioService {
     }
 
     public void deletar(Long id) {
+        usuarioProcessoSistemaRepository.deletarPorUsuario(id);
+        enderecoUsuarioRepository.deleteById(id);
         usuarioRepository.deleteById(id);
     }
 }
